@@ -1,0 +1,154 @@
+#+TITLE: BMND
+
+* Быстрый старт
+  #+BEGIN_SRC php
+  <?php
+  require __DIR__ . '/vendor/autoload.php';
+  
+  \BMND\Core\Router\Router::setup('app/Controllers', 'App\\Controllers\\')->run();
+  #+END_SRC
+
+* Установка
+  ** Composer
+     #+BEGIN_SRC bash
+     composer require bmnd/core
+     #+END_SRC
+
+* Контроллеры
+  ** Базовый контроллер
+     #+BEGIN_SRC php
+     <?php
+     namespace App\Controllers;
+     
+     use BMND\Core\Router\Route;
+     
+     class TestController
+     {
+         #[Route('/test/{id}', 'GET', 'test.show')]
+         public function show(int $id)
+         {
+             return "ID: {$id}";
+         }
+     }
+     #+END_SRC
+
+* Маршрутизация
+  ** Атрибут Route
+     #+BEGIN_SRC php
+     #[Route('/path/{param}', ['METHODS'], 'route.name', middlewares: [Middleware::class])]
+     #+END_SRC
+
+  ** Параметры пути
+     /user/{id}          
+
+* Dependency Injection
+  ** Автоматическая инъекция
+     #+BEGIN_SRC php
+     public function index(UserService $service, int $id)
+     {
+         // $service автоматически создастся
+         return $service->find($id);
+     }
+     #+END_SRC
+
+* Middleware
+  ** Создание middleware
+     #+BEGIN_SRC php
+     <?php
+     namespace App\Middleware;
+     
+     use BMND\Core\Http\MiddlewareInterface;
+     use BMND\Core\Http\RequestInterface;
+     use BMND\Core\Http\ResponseInterface;
+     use BMND\Core\Http\RequestHandlerInterface;
+     
+     class AuthMiddleware implements MiddlewareInterface
+     {
+         public function process(RequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+         {
+             if (!auth_check()) {
+                 return new Response('Unauthorized', 401);
+             }
+             return $handler->handle($request);
+         }
+     }
+     #+END_SRC
+
+  ** Использование
+     #+BEGIN_SRC php
+     #[Route('/admin', 'GET', 'admin', middlewares: [AuthMiddleware::class, AdminMiddleware::class])]
+     #+END_SRC
+
+* Request & Response
+  ** Request методы
+     $request->getMethod()
+     $request->getUri()
+     $request->getQueryParams()  // ?a=b
+     $request->getParsedBody()   // POST данные
+     $request->getAttributes()   // параметры пути
+     $request->getCookieParams()
+     $request->getServerParams()
+
+  ** Создание Response
+     #+BEGIN_SRC php
+     return new Response('Content', 200, ['Content-Type' => 'text/html']);
+     #+END_SRC
+
+* Исключения
+** Исключения в контроллерах
+#+BEGIN_SRC php
+use BMND\Core\Router\Error;
+class ErrorController
+{
+	#[Error("App\\Exception\\TestException")] // отлов TestException
+	public function TestException(TestException $exception)
+	{
+		echo "TestException: " . $exception->getMessage();
+	}
+
+	#[Error(404)] // Вызывается когда не найден маршрут
+    public function notFound()
+    {
+        return "Page not found";
+    }
+
+	#[Error(500)] // Любые ошибки не отловленные отдельно
+	public function internalError(\Throwable $exception)
+	{
+		echo $exception->getMessage();
+	}
+}
+#+END_SRC
+* Расширенные примеры
+  ** API контроллер
+     #+BEGIN_SRC php
+     #[Route('api')]
+     class ApiController
+     {
+     	#[Route('/users', 'GET', 'api.users.index')]
+     	public function index(UserService $service)
+     	{
+     		return new Response($service->all());
+     	}
+
+     	#[Route('/users/{id}', 'GET', 'api.users.show')]
+     	public function show(int $id, UserService $service)
+     	{
+     		return new Response($service->find($id));
+     	}
+     }
+     #+END_SRC
+
+  ** Middleware цепочка
+     #+BEGIN_SRC php
+     #[Route('/dashboard', 'GET', 'dashboard', 
+         middlewares: [CorsMiddleware::class, AuthMiddleware::class, LogMiddleware::class]
+     )]
+     #+END_SRC
+
+* FAQ
+  ** PSR
+     Да, RequestInterface/ResponseInterface совместимы с PSR-7
+
+* Лицензия
+  MIT License.

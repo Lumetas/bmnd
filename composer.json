@@ -1,0 +1,16 @@
+{
+    "name": "bmnd/core",
+    "autoload": {
+        "psr-4": {
+            "BMND\\": "src/"
+
+        }
+    },
+    "authors": [
+        {
+            "name": "lumetas",
+            "email": "lumetas506@gmail.com"
+        }
+    ],
+    "require": {}
+}
