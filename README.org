@@ -5,7 +5,7 @@
 <?php
 require __DIR__ . '/vendor/autoload.php';
 
-\BMND\Router\Router::setup('app/Controllers', 'App\\Controllers\\')->run();
+\BMND\Router\Router::setup('app/Controllers', 'App\\Controllers\\', 'path/to/cacheDir')->run();
 #+END_SRC
 
 * Установка
