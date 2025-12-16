@@ -80,43 +80,45 @@ class AuthMiddleware implements MiddlewareInterface
 #+END_SRC
 
 * Request & Response
-	** Request методы
+** Request методы
+#+BEGIN_SRC php
 	$request->getMethod()
 	$request->getUri()
 	$request->getQueryParams()  // ?a=b
 	$request->getParsedBody()   // POST данные
 	$request->getAttributes()   // параметры пути
 	$request->getCookieParams()
-$request->getServerParams()
-
-	** Создание Response
-#+BEGIN_SRC php
-	return new Response('Content', 200, ['Content-Type' => 'text/html']);
+ $request->getServerParams()
 #+END_SRC
 
-	* Исключения
-	** Исключения в контроллерах
+** Создание Response
 #+BEGIN_SRC php
-	use BMND\Router\Error;
-	class ErrorController
+return new Response('Content', 200, ['Content-Type' => 'text/html']);
+#+END_SRC
+
+* Исключения
+** Исключения в контроллерах
+#+BEGIN_SRC php
+    use BMND\Router\Error;
+    class ErrorController
 {
 #[Error("App\\Exception\\TestException")] // отлов TestException
-	public function TestException(TestException $exception)
-	{
-		echo "TestException: " . $exception->getMessage();
-	}
+    public function TestException(TestException $exception)
+    {
+        echo "TestException: " . $exception->getMessage();
+    }
 
 #[Error(404)] // Вызывается когда не найден маршрут
-	public function notFound()
-	{
-		return "Page not found";
-	}
+    public function notFound()
+    {
+        return "Page not found";
+    }
 
 #[Error(500)] // Любые ошибки не отловленные отдельно
-	public function internalError(\Throwable $exception)
-	{
-		echo $exception->getMessage();
-	}
+    public function internalError(\Throwable $exception)
+    {
+        echo $exception->getMessage();
+    }
 }
 #+END_SRC
 * Расширенные примеры
