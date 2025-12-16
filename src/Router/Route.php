@@ -8,7 +8,7 @@ class Route
 {
     public function __construct(
         public string $path,
-        public string $method = 'GET',
+        public string|array $method = 'GET',
         public ?string $name = null,
         public mixed $middlewares = null
     ) {}

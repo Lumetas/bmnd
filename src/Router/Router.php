@@ -142,6 +142,7 @@ class Router implements RequestHandlerInterface
 
 		$this->routes = $cacheData['routes'];
 		$this->namedRoutes = $cacheData['named_routes'];
+		$this->errors = $cacheData['errors'];
 		return true;
 	}
 
@@ -183,6 +184,7 @@ class Router implements RequestHandlerInterface
 			'controllers_hash' => $this->getControllersHash(),
 			'routes' => $this->routes,
 			'named_routes' => $this->namedRoutes,
+			'errors' => $this->errors,
 		];
 
 		file_put_contents($this->getCacheFile(), serialize($cacheData));
