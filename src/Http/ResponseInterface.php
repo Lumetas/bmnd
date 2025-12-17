@@ -1,7 +1,9 @@
 <?php
 namespace BMND\Http;
+use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
+use Psr\Http\Message\StreamInterface;
 
-interface ResponseInterface
+interface ResponseInterface extends PsrResponseInterface
 {
     public function getStatusCode(): int;
     public function withStatus(int $code, string $reasonPhrase = ''): self;
@@ -15,7 +17,7 @@ interface ResponseInterface
     public function withHeader(string $name, $value): self;
     public function withAddedHeader(string $name, $value): self;
     public function withoutHeader(string $name): self;
-    public function getBody(): string;
-    public function withBody(string $body): self;
+    public function getBody(): StreamInterface;
+    public function withBody(StreamInterface $body): self;
     public function send(): void;
 }

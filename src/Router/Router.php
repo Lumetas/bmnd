@@ -5,13 +5,13 @@ namespace BMND\Router;
 use ReflectionClass;
 use BMND\DI;
 use ReflectionMethod;
-use BMND\Http\RequestInterface;
 use BMND\Http\MiddlewareHandler;
 use BMND\Http\ResponseInterface;
+use BMND\Http\MiddlewareInterface;
 use BMND\Http\Request;
 use BMND\Http\Response;
-use BMND\MiddlewareInterface;
 use BMND\Http\RequestHandlerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class Router implements RequestHandlerInterface
 {
@@ -24,7 +24,7 @@ class Router implements RequestHandlerInterface
 	private array $errors = [];
 	private bool $cacheEnabled = false;
 	private static ?self $instance = null;
-	private RequestInterface $request;
+	private ServerRequestInterface $request;
 	private array $groupStack = [];
 
 	public static function setup(string $controllersPath, string $controllersNamespace = '', ?string $cachePath = null): self
@@ -63,7 +63,7 @@ class Router implements RequestHandlerInterface
 		}
 	}
 
-	public function handle(RequestInterface $request): ResponseInterface
+	public function handle(ServerRequestInterface $request): ResponseInterface
 	{
 		$this->request = $request;
 
@@ -371,7 +371,7 @@ class Router implements RequestHandlerInterface
 		}
 	}
 
-	private function dispatch(RequestInterface $request): ResponseInterface
+	private function dispatch(ServerRequestInterface $request): ResponseInterface
 	{
 		$params = [];
 		$requestUri = parse_url($request->getUri(), PHP_URL_PATH);
@@ -428,16 +428,10 @@ class Router implements RequestHandlerInterface
 				$reflection = new ReflectionMethod($class, $method);
 
 				if ($reflection->isStatic()) {
-					$result = DI::call([$class, $method], [
-						'request' => $this->request,
-						'exception' => $exception
-					]);
+					$result = DI::call([$class, $method], [$exception]);
 				} else {
 					$controller = DI::make($class);
-					$result = DI::call([$controller, $method], [
-						'request' => $this->request,
-						'exception' => $exception
-					]);
+					$result = DI::call([$controller, $method], [$exception]);
 				}
 
 				return $this->ensureResponse($result, $httpCode);
@@ -462,7 +456,7 @@ class Router implements RequestHandlerInterface
 
 		if (is_array($result) || is_object($result)) {
 			$response = new Response('', $defaultCode, ['Content-Type' => 'application/json']);
-			return $response->withBody(json_encode($result, JSON_PRETTY_PRINT));
+			return $response->withJson($result, JSON_PRETTY_PRINT);
 		}
 
 		return new Response((string)$result, $defaultCode);
@@ -480,7 +474,7 @@ class Router implements RequestHandlerInterface
 		$this->cacheEnabled = $enabled && $this->cachePath !== null;
 	}
 
-	public function getRequest(): RequestInterface
+	public function getRequest(): ServerRequestInterface
 	{
 		return $this->request;
 	}

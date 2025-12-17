@@ -2,9 +2,9 @@
 namespace BMND\Router;
 
 use BMND\DI;
-use BMND\Http\RequestInterface;
 use BMND\Http\ResponseInterface;
 use BMND\Http\RequestHandlerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class RouteHandler implements RequestHandlerInterface
 {
@@ -17,7 +17,7 @@ class RouteHandler implements RequestHandlerInterface
         $this->params = $params;
     }
 
-    public function handle(RequestInterface $request): ResponseInterface
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         [$class, $method] = $this->handler;
         $controller = DI::make($class);

@@ -1,7 +1,9 @@
 <?php
 namespace BMND\Http;
 
+use Psr\Http\Message\ServerRequestInterface;
+
 interface RequestHandlerInterface
 {
-    public function handle(RequestInterface $request): ResponseInterface;
+    public function handle(ServerRequestInterface $request): ResponseInterface;
 }

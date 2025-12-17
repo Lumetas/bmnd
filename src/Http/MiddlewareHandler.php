@@ -2,6 +2,7 @@
 namespace BMND\Http;
 
 use BMND\DI;
+use Psr\Http\Message\ServerRequestInterface;
 
 class MiddlewareHandler implements RequestHandlerInterface
 {
@@ -15,7 +16,7 @@ class MiddlewareHandler implements RequestHandlerInterface
         $this->finalHandler = $finalHandler;
     }
 
-    public function handle(RequestInterface $request): ResponseInterface
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         if ($this->index >= count($this->middlewares)) {
             return $this->finalHandler->handle($request);
